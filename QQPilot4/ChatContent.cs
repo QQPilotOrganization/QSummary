@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace QQPilot4
 {
@@ -57,6 +59,26 @@ namespace QQPilot4
             {
                 return $"{Username}:{content}";
             }
+        }
+        public string ToJson(bool indented = false)
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = indented,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase, // 属性名转小驼峰
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull // 忽略null值
+            };
+
+            var data = new
+            {
+                Username,
+                ImagePaths = ImagePaths?.Where(p => File.Exists(p)).ToList(), // 仅保留有效图片
+                Text = string.IsNullOrEmpty(Text) ? "【空】" : Text,
+                Time,
+                OwnByMyself
+            };
+
+            return JsonSerializer.Serialize(data, options);
         }
     }
 }
