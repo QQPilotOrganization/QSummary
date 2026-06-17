@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QQPilot4
+namespace QSummaryCore
 {
     internal class Log
     {

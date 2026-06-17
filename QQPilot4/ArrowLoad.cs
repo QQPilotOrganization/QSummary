@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace QQPilot4
+namespace QSummaryCore
 {
     internal class ArrowLoad
     {

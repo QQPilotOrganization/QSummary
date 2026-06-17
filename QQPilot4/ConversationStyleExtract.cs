@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace QQPilot4
+namespace QSummaryCore
 {
     /// <summary>
     /// 聊天记录解析器，用于从特定格式的字符串中提取结构化的聊天内容。

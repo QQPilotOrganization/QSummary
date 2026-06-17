@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace QQPilot4
+namespace QSummaryCore
 {
     internal class Focus
     {

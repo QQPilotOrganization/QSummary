@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using IniParser;
 
-namespace QQPilot4
+namespace QSummaryCore
 {
     // === 结构体定义 ===
     [StructLayout(LayoutKind.Sequential)]
@@ -35,6 +35,7 @@ namespace QQPilot4
     internal static class NativeMethods
     {
         private const string VisionDll = "Vision.dll";
+        private const string VisionIIDll = "VisionII.dll";
         private const string ScreenCaptureDll = "ScreenCapture.dll";
 
         // ScreenCapture.dll 函数
@@ -69,6 +70,17 @@ namespace QQPilot4
 
         [DllImport(VisionDll, CallingConvention = CallingConvention.Cdecl)]
         public static extern void matchTemplateEnd();
+
+        //[DllImport("VisionII.dll", CallingConvention = CallingConvention.Cdecl)]
+        //[return: MarshalAs(UnmanagedType.I1)] 
+        //public static extern bool CropImage(
+        //    string src,
+        //    string dst,
+        //    int x,
+        //    int y,
+        //    int w,
+        //    int h
+        //);
     }
 
     // === 主逻辑类 ===
@@ -108,6 +120,15 @@ namespace QQPilot4
             int result = NativeMethods.fullScreenshot();
             return result != 1;
         }
+        //public static bool CropImage(string src,
+        //    string dst,
+        //    int x,
+        //    int y,
+        //    int w,
+        //    int h)
+        //{
+        //    return NativeMethods.CropImage(src, dst, x, y, w, h);
+        //}
 
         public static (uint x, uint y) ContainsRedDot(RECT rect)
         {

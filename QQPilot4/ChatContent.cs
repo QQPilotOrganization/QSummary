@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace QQPilot4
+namespace QSummaryCore
 {
     public class ChatContent(string username, List<string> imagePaths, string text, string time, bool ownByMyself)
     {

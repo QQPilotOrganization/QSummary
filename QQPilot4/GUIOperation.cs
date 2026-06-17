@@ -9,7 +9,7 @@ using System.Windows;
 using TextCopy;
 //using Xamarin.Essentials;
 
-namespace QQPilot4
+namespace QSummaryCore
 {
     class GUIOperation
     {
