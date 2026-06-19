@@ -190,11 +190,6 @@
                             <input type="number" id="scroll" value="${config.scroll != null ? config.scroll : ''}">
                         </div>
                         <div class="form-group">
-                            <label class="setting-key">包含图片</label class="setting-key">
-                            <label class="setting-key"><input type="radio" name="withimage" value="true" ${config.withImage === true ? 'checked' : ''}> 是</label class="setting-key">
-                            <label class="setting-key"><input type="radio" name="withimage" value="false" ${config.withImage !== true ? 'checked' : ''}> 否</label class="setting-key">
-                        </div>
-                        <div class="form-group">
                             <label class="setting-key">自动聚焦</label class="setting-key">
                             <label class="setting-key"><input type="radio" name="autofocusing" value="true" ${config.autoFocusing === true ? 'checked' : ''}> 是</label class="setting-key">
                             <label class="setting-key"><input type="radio" name="autofocusing" value="false" ${config.autoFocusing !== true ? 'checked' : ''}> 否</label class="setting-key">
@@ -255,7 +250,6 @@
                     api_key: document.getElementById('api_key').value,
                     server_url: document.getElementById('server_url').value,
                     scroll: document.getElementById('scroll').value,
-                    withimage: document.querySelector('input[name="withimage"]:checked').value,
                     autofocusing: document.querySelector('input[name="autofocusing"]:checked').value,
                     atdetect: document.querySelector('input[name="atdetect"]:checked').value,
                     tab_times: document.getElementById('tab_times').value,

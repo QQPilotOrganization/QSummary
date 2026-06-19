@@ -1,51 +1,52 @@
 ```plain text
-   ____     ____    _____    _   _           _   
-  / __ \   / __ \  |  __ \  (_) | |         | |  
- | |  | | | |  | | | |__) |  _  | |   ___   | |_ 
- | |  | | | |  | | |  ___/  | | | |  / _ \  | __|
- | |__| | | |__| | | |      | | | | | (_) | | |_ 
-  \___\_\  \___\_\ |_|      |_| |_|  \___/   \__|
+结果
+   ___    ____                                                         
+  / _ \  / ___|   _   _   _ __ ___    _ __ ___     __ _   _ __   _   _ 
+ | | | | \___ \  | | | | | '_ ` _ \  | '_ ` _ \   / _` | | '__| | | | |
+ | |_| |  ___) | | |_| | | | | | | | | | | | | | | (_| | | |    | |_| |
+  \__\_\ |____/   \__,_| |_| |_| |_| |_| |_| |_|  \__,_| |_|     \__, |
+                                                                 |___/ 
                                         
 ```
-# QQPilot - 基于窗口自动化的 QQ 自动回复机器人
-
-[Linux版本](https://github.com/QQPilotOrganization/QQPilotLinux)
-[Android](https://github.com/QQPilotOrganization/QQPilotPocketEdition)
+# QSummary - 基于窗口自动化的 QQ 聊天记录总结
 
 
-<div align="center">
-
-<img src="https://stone.professorlee.work/api/stone/Na2Cr2O7/QQPilot" alt="Stone Badge" width="200"  />
-</div>
 
 <!-- [![示例截图](./QQPilot.jpeg)](./QQPilot.jpeg) -->
 <div align="center">
 
-<img alt="示例截图" src="./assets/qqpilot.png" width="300" >
+<img alt="示例截图" src="./assets/index.png" width="300" >
 </div>
 
 
 
 
 
-> 使用纯视觉 + 窗口自动化实现 QQ 消息自动回复，**零 API 依赖、零注入、低封号风险**。  
+> 使用纯视觉 + 窗口自动化实现 QQ 消息总结，**零 API 依赖、零注入、低封号风险**。  
+（仅Windows）
 
 ##  项目简介
 
-QQPilot 是一个全自动的 QQ 聊天机器人，通过以下流程实现智能回复：
+QSummary基于窗口自动化的 QQ 聊天记录总结，通过以下流程实现总结：
 
-> **复制聊天内容 → 解析消息（含图片/表情包）→ 调用 LLM 生成回复 → 模拟输入并发送**
+> **复制聊天内容 → 解析消息（含图片/表情包）→ 存入数据库 ->前端选择群聊 -> 使用远程或本地LLM总结 **
+
 
 全程 **不调用 QQ 内部接口、不 Hook 进程、不注入 DLL**，极大降低账号封禁风险。
 
+还可以使用Ollama实现数据不出电脑。
+
+提示：由于使用了浏览器界面，可以尝试着在虚拟机中运行，并在实体机中查看聊天记录和总结。
 ---
 
 ## 安装指南
 
 ### 步骤 1：下载项目
-前往 [Releases 页面](https://github.com/Na2Cr2O7/QQPilot/releases) 下载最新压缩包并解压。
+前往 [Releases 页面](https://github.com/Na2Cr2O7/QSummary/releases) 下载最新压缩包并解压。
 
-解压后大小<6M.
+解压后大小<35M.
+
+需要安装[umi-ocr](https://github.com/hiroi-sora/Umi-OCR/releases)作为OCR读取群名称
 
 可能需要安装[.NET10](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-10.0.203-windows-x64-installer)
 
@@ -55,33 +56,29 @@ QQPilot 是一个全自动的 QQ 聊天机器人，通过以下流程实现智�
 安装 [Ollama](https://ollama.com/) 并拉取模型：
 
 ```bash
-# 推荐主力模型（8B，性能与效果平衡）
-ollama pull huihui_ai/deepseek-r1-abliterated:8b
+# 推荐主力模型（20B，性能与效果平衡）
+gpt-oss:20b-cloud
+#云端模型无需拉取，直接在设置中填上就可以了
+
 
 # 低配设备可选（0.5B，轻量快速）
 ollama pull qwen2.5:0.5b
 
-# 视觉多模态模型（实验性，效果一般，慎用）
+# 本地视觉多模态模型（实验性，效果一般，慎用）
 ollama pull huihui_ai/qwen3-vl-abliterated:latest
 ```
 
-* 可以在虚拟机上使用，详情见[教程](useollamainVM/useOllamainVM.md)
 
-<!-- ~~  💡 强烈建议使用纯文本模型。当前本地视觉模型对表情包/截图理解能力有限，易出错。~~ -->
-
-> 如需使用自定义 API（如 OpenAI、Claude、自建 LLM），请在 `设置.exe` 中配置。
 
 ### 步骤 3：初始化设置
-运行 `设置.exe` 配置模型类型、API 地址、截图区域等参数。
-
+运行 `QsummaryUI.exe` 
+进入[localhost:8080](http://localhost:8080/)修改设置，如模型等
+使用Ollama时，服务器地址可以直接填写Ollama.
+umi-OCR中，打开允许HTTP服务.
+![alt text](image.png)
 
 ## ▶️ 使用方法
-
-1. （可选）将自定义表情包放入 `.\Images` 文件夹  
-2. 打开 QQ 客户端并登录账号  
-3. **确保 QQ 主窗口始终可见（不要最小化或遮挡）**  
-4. 双击运行 `QQPilot菜单` 启动主程序  
-5. 程序将自动监控未读消息并智能回复
+运行QsummaryCore.exe，确保QQ打开并置于前台
 
 > ******运行期间请勿更改 DPI/分辨率！******
 
@@ -132,24 +129,11 @@ ollama pull huihui_ai/qwen3-vl-abliterated:latest
 
  - 1GB RAM
 
- - 200M 可用空间
+ - 1GB 可用空间
 
  - 1920x1080 显示器
 
 > 对于windows7 可以尝试安装 [VkKex](https://github.com/YuZhouRen86/VxKex-NEXT)
-
-
-
-### ARM64
-
- - Windows 10ARM64 及以上
-
- - 1GB RAM
-
- - 200M 可用空间
-
- - 1920x1080 显示器
-
 
 ### 推荐配置
 
@@ -208,23 +192,15 @@ ollama pull huihui_ai/qwen3-vl-abliterated:latest
    - 支持提取普通文本、时间戳、用户昵称及本地图片路径
    - 可识别并提取表情包（需启用视觉模型）
 
-6. **智能回复生成**  
-   将解析后的内容传入本地大模型（如 Ollama）或自定义 HTTP API，生成自然语言回复。
-
-7. **自动发送**  
-   - 将回复粘贴至 QQ 输入框  
-   - （可选）随机插入 `.\Images` 中的表情包  （Linux不支持） 
-   - 模拟回车键发送消息
-
 8. **会话清理**  
-   发送完成后自动关闭当前聊天窗口，返回主界面继续监听。
+   完成后自动关闭当前聊天窗口，返回主界面继续监听。
 
 
 ---
 
 ## 🛠️ 编译说明（开发者）
 
-使用 **Visual Studio 2026** 打开并编译以下解决方案（仅Windows）：
+使用 **Visual Studio 2026** 打开并编译以下解决方案：
 - `VisionQQ_C.slnx`
 - `QQPilot4\QQPilot4.slnx`
 

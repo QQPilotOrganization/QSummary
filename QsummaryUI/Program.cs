@@ -127,7 +127,6 @@ app.MapGet("/api/config", (Config config) =>
         config.ApiKey,
         config.ServerUrl,
         config.Scroll,
-        config.WithImage,
         config.AutoFocusing,
         config.AtDetect,
         config.TabTimes,
@@ -184,9 +183,6 @@ app.MapPost("/api/config", async (HttpRequest req, Config config) =>
                     break;
                 case "scroll":
                     config.Scroll = int.Parse(kvp.Value);
-                    break;
-                case "withimage":
-                    config.WithImage = kvp.Value.Equals("true", StringComparison.OrdinalIgnoreCase);
                     break;
                 case "autofocusing":
                     config.AutoFocusing = kvp.Value.Equals("true", StringComparison.OrdinalIgnoreCase);
@@ -355,7 +351,6 @@ public class Config
                 if (general.ContainsKey("api_key")) ApiKey = general["api_key"];
                 if (general.ContainsKey("server_url")) ServerUrl = general["server_url"];
                 if (general.ContainsKey("scroll")) Scroll = int.Parse(general["scroll"]);
-                if (general.ContainsKey("withimage")) WithImage = bool.Parse(general["withimage"]);
                 if (general.ContainsKey("autofocusing")) AutoFocusing = bool.Parse(general["autofocusing"]);
                 if (general.ContainsKey("atdetect")) AtDetect = bool.Parse(general["atdetect"]);
                 if (general.ContainsKey("tab_times")) TabTimes = int.Parse(general["tab_times"]);
@@ -444,7 +439,6 @@ public class Config
         general["api_key"] = ApiKey;
         general["server_url"] = ServerUrl;
         general["scroll"] = Scroll.ToString();
-        general["withimage"] = WithImage.ToString().ToLower();
         general["autofocusing"] = AutoFocusing.ToString().ToLower();
         general["atdetect"] = AtDetect.ToString().ToLower();
         general["tab_times"] = TabTimes.ToString();
@@ -479,9 +473,6 @@ public class Config
                 break;
             case "scroll":
                 general["scroll"] = Scroll.ToString();
-                break;
-            case "withimage":
-                general["withimage"] = WithImage.ToString().ToLower();
                 break;
             case "autofocusing":
                 general["autofocusing"] = AutoFocusing.ToString().ToLower();
