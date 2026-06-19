@@ -53,12 +53,21 @@ namespace QSummaryCore
 
             if (OwnByMyself)
             {
-                return content[..(content.ToString().Length-1)];
+                return content[..(content.ToString().Length - 1)];
             }
             else
             {
                 return $"{Username}:{content}";
             }
+        }
+
+        public static bool operator ==(ChatContent self, ChatContent other)
+        {
+            return (self.Text==other.Text && self.Time==other.Time && self.Username==other.Username);
+        }
+        public static bool operator !=(ChatContent self, ChatContent other)
+        {
+            return !(self == other);
         }
         public string ToJson(bool indented = false)
         {

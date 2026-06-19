@@ -5,7 +5,6 @@
     <Platform Name="x64" />
   </Configurations>
   <Project Path="../QsummaryUI/QsummaryUI.csproj" Id="7c7c38da-f2d9-4442-b7b4-760e0b292017" />
-  <Project Path="../t/t.csproj" Id="358f9925-255e-4cd5-a7f5-bf5fc7b8f441" />
   <Project Path="QsummaryCore.csproj">
     <Platform Solution="*|ARM64" Project="ARM64" />
     <Platform Solution="*|x64" Project="x64" />

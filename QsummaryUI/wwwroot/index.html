@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QSummary - 聊天记录总结</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div class="container" id="app">
+        <header>
+            <h1>QSummary - 聊天记录总结</h1>
+            <div class="top-bar">
+                <button class="btn-secondary" onclick="showHome()">主页</button>
+                <button class="btn-secondary" onclick="showSettings()">设置</button>
+            </div>
+        </header>
+        <div id="content">
+            <!-- 内容将通过 JavaScript 动态加载 -->
+        </div>
+    </div>
+
+    <!-- 模态框模板 -->
+    <div class="modal-overlay" id="confirmModal" style="display: none;">
+        <div class="modal">
+            <h2>确认总结</h2>
+            <p id="confirmMessage">确定要进行总结吗？</p>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn-primary" onclick="confirmSummary()">开始总结</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认模态框 -->
+    <div class="modal-overlay" id="deleteConfirmModal" style="display: none;">
+        <div class="modal">
+            <h2 style="color: var(--danger-color);">确认删除</h2>
+            <p style="color: var(--text-color);">确定要删除所有聊天记录吗？此操作不可恢复！</p>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeDeleteConfirm()">取消</button>
+                <button class="btn-danger" onclick="clearDatabase()">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js">
+
+    </script>
+</body>
+
+</html>

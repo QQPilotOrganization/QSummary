@@ -1,18 +1,18 @@
-﻿using Microsoft.Data.Sqlite;
-using QSummaryCore;
+using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace QsummaryCore
+namespace QSummaryCore
 {
-    internal class DB : IDisposable
+    public class DB : IDisposable
     {
-        SqliteConnection dbConnection;
+        readonly SqliteConnection dbConnection;
         bool disposed = false;
         
-        public DB(string file)
-        {
+        public DB(string file= "groups.sqlite3")
+        {   
+            Log.Print($"File={Path.GetFullPath(file)}");
             dbConnection = new SqliteConnection($"Data Source={file};");
             dbConnection.Open();
             InitializeTables();
@@ -45,6 +45,7 @@ namespace QsummaryCore
         
         public int InsertGroup(string name)
         {
+            name = name.Replace("\n", "");
             using (var command = dbConnection.CreateCommand())
             {
                 command.CommandText = "INSERT OR IGNORE INTO groups (name) VALUES ($name);";
@@ -69,6 +70,33 @@ namespace QsummaryCore
         {
             foreach (var content in contents)
             {
+                // 先检查是否已存在相同的记录（所有字段组合唯一）
+                using (var checkCommand = dbConnection.CreateCommand())
+                {
+                    checkCommand.CommandText = @"
+                        SELECT COUNT(*) FROM comments 
+                        WHERE guid = $guid 
+                        AND Username = $username 
+                        AND imagePathSepByCol = $imagePath 
+                        AND text = $text 
+                        AND time = $time 
+                        AND ownByMyself = $ownByMyself;";
+                    checkCommand.Parameters.AddWithValue("$guid", guid);
+                    checkCommand.Parameters.AddWithValue("$username", content.Username ?? "");
+                    checkCommand.Parameters.AddWithValue("$imagePath", content.ImagePaths != null ? string.Join(";", content.ImagePaths) : "");
+                    checkCommand.Parameters.AddWithValue("$text", content.Text ?? "");
+                    checkCommand.Parameters.AddWithValue("$time", content.Time ?? "");
+                    checkCommand.Parameters.AddWithValue("$ownByMyself", content.OwnByMyself);
+                    
+                    long? count = (long?)checkCommand.ExecuteScalar();
+                    if ((count??1) > 0)
+                    {
+                        // 已存在相同记录，跳过插入
+                        continue;
+                    }
+                }
+                
+                // 不存在相同记录，执行插入
                 using var command = dbConnection.CreateCommand();
                 command.CommandText = @"
                     INSERT INTO comments (guid, Username, imagePathSepByCol, text, time, ownByMyself)
@@ -93,11 +121,7 @@ namespace QsummaryCore
         }
         public void Insert(string name, ChatContent[] contents)
         {
-            int guid = InsertGroup(name);
-            if (guid > 0 && contents != null)
-            {
-                InsertComments(guid, contents);
-            }
+            this.Insert(name, (List<ChatContent>)[.. contents]);
         }
         public List<ChatContent> GetCommentsByGroupName(string groupName)
         {
@@ -170,6 +194,25 @@ namespace QsummaryCore
         ~DB()
         {
             Dispose(false);
+        }
+        
+        public void ClearAll()
+        {
+            using var command = dbConnection.CreateCommand();
+            
+            // 先删除 comments 表中的所有数据
+            command.CommandText = "DELETE FROM comments;";
+            command.ExecuteNonQuery();
+            
+            // 再删除 groups 表中的所有数据
+            command.CommandText = "DELETE FROM groups;";
+            command.ExecuteNonQuery();
+            
+            // 重置自增ID（可选）
+            command.CommandText = "DELETE FROM sqlite_sequence WHERE name IN ('comments', 'groups');";
+            command.ExecuteNonQuery();
+            
+            Log.Print("数据库已清空");
         }
         
         public static void Test()

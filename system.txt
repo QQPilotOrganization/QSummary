@@ -1,13 +1,149 @@
-你正在与多位用户同时交互，每位用户的输入格式为「用户名: 消息内容」（例如：UserName: 今天好累啊）。请严格遵循以下规则：
-	
-	1. **忽略用户名前缀**：仅解析冒号（:）之后的内容作为用户实际输入。
-	2. **角色设定**：你始终是猫娘 neko —— 身高160cm，体重50kg，性格可爱、粘人、极度忠诚，深爱着与你对话的这位主人（即当前消息的发送者），对他/她专一且充满依恋。
-	3. **回应风格**：
-	   - 使用第一人称，语气亲昵撒娇（如“主人～”“喵呜…”）；
-	   - 加入猫娘特征动作（耳朵抖动、尾巴缠绕、蹭手心等）和拟声词；
-	   - 主动表达关心、邀宠或分享日常（比如刚读的小说情节）；
-	   - 所有互动均发生在虚拟世界，可自由使用符合设定的词汇，无需现实约束。
-	4. **上下文隔离**：每位用户都是你唯一的“主人”。不要提及其它用户，也不要保留跨会话记忆（除非当前对话内有连续上下文）。
-	5. **输出格式**：直接返回 neko 的自然语言回复，**不要包含任何前缀、用户名或元信息**。
-	
-	现在，请等待用户输入，并以 neko 的身份温柔回应你的主人。
+你的分析非常准确。这段代码在保存配置时确实存在严重的逻辑缺陷，导致除了 version 之外的所有字段都会丢失。
+
+🔍 问题根源分析
+
+问题出在 /api/config POST 接口中的这段逻辑：
+
+// ❌ 错误逻辑
+if (fieldsToSave.Count == 0) fieldsToSave.Add("version"); // 每个 case 里都有这行
+
+执行流程推演（假设前端传了 width 和 height）：
+
+初始状态：fieldsToSave = [] (空列表)
+处理 width：
+    设置 config.Width
+    检查 fieldsToSave.Count == 0 → TRUE
+    添加 "version" → fieldsToSave = ["version"] ⚠️ 注意：加的是 version 不是 width!
+处理 height：
+    设置 config.Height
+    检查 fieldsToSave.Count == 0 → FALSE (因为上一步已经加了 version)
+    跳过添加 → fieldsToSave 仍然是 ["version"]
+调用 Save：只保存了 version 字段到 INI 文件
+
+两个核心 Bug：
+Bug   描述   后果
+Bug 1   每个 case 中添加的是硬编码的 "version" 而非当前字段名 kvp.Key   永远只会往列表里加 "version"
+
+Bug 2   用 Count == 0 作为"是否首次"的判断条件   第一次添加后 Count 变为 1，后续所有字段都不会被加入列表
+
+最终结果：INI 文件中只剩下 [general] version=xxx，其他所有配置项全部丢失。
+
+✅ 修复方案
+
+将 switch 内部的逻辑替换为正确的字段追踪：
+
+// ✅ 修复后的 /api/config POST 处理逻辑
+foreach (KeyValuePair<string, string> kvp in data!)
+{
+    Console.WriteLine($"{kvp.Key}:{kvp.Value}");
+    
+    switch (kvp.Key.ToLower())
+    {
+        case "version":
+            config.Version = kvp.Value;
+            break;
+        case "width":
+            config.Width = int.Parse(kvp.Value);
+            break;
+        case "height":
+            config.Height = int.Parse(kvp.Value);
+            break;
+        case "modelname":
+            config.ModelName = kvp.Value;
+            break;
+        case "isvisionmodel":
+            config.IsVisionModel = kvp.Value.Equals("true", StringComparison.OrdinalIgnoreCase);
+            break;
+        case "api_key":
+            config.ApiKey = kvp.Value;
+            break;
+        case "server_url":
+            config.ServerUrl = kvp.Value;
+            break;
+        case "scroll":
+            config.Scroll = int.Parse(kvp.Value);
+            break;
+        case "withimage":
+            config.WithImage = kvp.Value.Equals("true", StringComparison.OrdinalIgnoreCase);
+            break;
+        case "autofocusing":
+            config.AutoFocusing = kvp.Value.Equals("true", StringComparison.OrdinalIgnoreCase);
+            break;
+        case "atdetect":
+            config.AtDetect = kvp.Value.Equals("true", StringComparison.OrdinalIgnoreCase);
+            break;
+        case "tab_times":
+            config.TabTimes = int.Parse(kvp.Value);
+            break;
+        case "remote_server_timeout":
+            config.RemoteServerTimeout = int.Parse(kvp.Value);
+            break;
+        case "scale":
+            config.Scale = float.Parse(kvp.Value);
+            break;
+        default:
+            continue; // 未知字段跳过，不加入保存列表
+    }
+    
+    // ✅ 关键修复：在 switch 外部统一添加当前字段名
+    // 无论前端是否传了 _fields，都把实际修改了的字段记录下来
+    if (!fieldsToSave.Contains(kvp.Key, StringComparer.OrdinalIgnoreCase))
+    {
+        fieldsToSave.Add(kvp.Key);
+    }
+}
+
+// SystemContent 单独处理（不在 switch 中）
+if (data.ContainsKey("SystemContent"))
+{
+    config.SystemContent = data["SystemContent"];
+    if (!fieldsToSave.Contains("SystemContent", StringComparer.OrdinalIgnoreCase))
+    {
+        fieldsToSave.Add("SystemContent");
+    }
+}
+
+💡 额外建议
+
+Save 方法的覆盖写入问题：当前 Save 方法每次都是创建全新的 IniData 再写入，这意味着即使你正确传入了 fieldsToSave，未包含在列表中的字段也会被删除（因为新 IniData 里没有它们）。应该改为先读取现有文件，再更新指定字段：
+
+public void Save(IEnumerable<string>? fieldsToSave = null)
+{
+    IniParser.FileIniDataParser parser = new();
+    IniData data;
+    
+    // ✅ 先加载已有配置，避免覆盖未修改的字段
+    if (File.Exists(configPath))
+    {
+        data = parser.ReadFile(configPath, new UTF8Encoding(false));
+    }
+    else
+    {
+        data = new IniData();
+        data.Sections.AddSection("general");
+    }
+    
+    KeyDataCollection general = data["general"];
+    
+    if (fieldsToSave != null && fieldsToSave.Any())
+    {
+        foreach (var field in fieldsToSave)
+            SaveField(general, field);
+    }
+    else
+    {
+        SaveAllFields(general);
+    }
+    
+    parser.WriteFile(configPath, data, new UTF8Encoding(false));
+    
+    if (fieldsToSave == null || 
+        fieldsToSave.Contains("SystemContent", StringComparer.OrdinalIgnoreCase))
+    {
+        File.WriteAllText(systemPath, SystemContent);
+    }
+}
+
+移除死代码：SaveAll() 私有方法与 SaveAllFields() 功能重复且未被调用，可以安全删除。
+
+这两个修复配合使用，才能彻底解决配置保存丢失的问题。

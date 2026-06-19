@@ -20,7 +20,7 @@ namespace QSummaryCore
 
  
 
-            DB db = new("groups.sqlite3");
+            DB db = new();
             Process? p=null;
             Process? p2 = null;
 
@@ -174,7 +174,9 @@ namespace QSummaryCore
                     GUIOperation.Click((int)contain.Item1,(int)contain.Item2);
                     Thread.Sleep(1000);
                     Image.Screenshot(NameActualSize.Item1, NameActualSize.Item2, NameActualSize.Item3, NameActualSize.Item4);
-                    String groupName = (await ocr.RecognizeFileAsync("screenshot.png")).PlainText;
+                    String groupName = (await ocr.RecognizeFileAsync("screenshot.png")).PlainText.Replace("/","-");
+                    // groupName= //Uri.EscapeDataString(groupName); 
+                    groupName=UrlSanitizer.SanitizeUrlSegment(groupName);
                     //Log.Print(startDraggingAbsolutePosition.Item1.ToString(), startDraggingAbsolutePosition.Item2, endDraggingAbsolutePosition.Item1, endDraggingAbsolutePosition.Item2);
                     GUIOperation.DragFromToSimple(startDraggingAbsolutePosition.Item1,startDraggingAbsolutePosition.Item2,endDraggingAbsolutePosition.Item1,endDraggingAbsolutePosition.Item2);
                     Thread.Sleep(500);
