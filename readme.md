@@ -1,228 +1,143 @@
-```plain text
-结果
+<div align="center">
+
+```text
    ___    ____                                                         
   / _ \  / ___|   _   _   _ __ ___    _ __ ___     __ _   _ __   _   _ 
  | | | | \___ \  | | | | | '_ ` _ \  | '_ ` _ \   / _` | | '__| | | | |
  | |_| |  ___) | | |_| | | | | | | | | | | | | | | (_| | | |    | |_| |
   \__\_\ |____/   \__,_| |_| |_| |_| |_| |_| |_|  \__,_| |_|     \__, |
                                                                  |___/ 
-                                        
 ```
-# QSummary - 基于窗口自动化的 QQ 聊天记录总结
 
+# QSummary
 
+**基于窗口自动化的 QQ 聊天记录总结工具**
 
-<!-- [![示例截图](./QQPilot.jpeg)](./QQPilot.jpeg) -->
-<div align="center">
+[![Release](https://img.shields.io/github/v/release/Na2Cr2O7/QSummary?style=flat-square)](https://github.com/Na2Cr2O7/QSummary/releases)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](./LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows-lightgrey?style=flat-square)](#)
 
-<img alt="示例截图" src="./assets/index.png" width="300" >
+<img alt="示例截图" src="./assets/index.png" width="400" >
+
+> 💡 **纯视觉 + 窗口自动化 | 零 API 依赖 | 零注入 | 低封号风险**  
+> 支持 Ollama 本地部署，数据不出电脑，隐私安全可控。
+
 </div>
 
-
-
-
-
-> 使用纯视觉 + 窗口自动化实现 QQ 消息总结，**零 API 依赖、零注入、低封号风险**。  
-（仅Windows）
-
-##  项目简介
-
-QSummary基于窗口自动化的 QQ 聊天记录总结，通过以下流程实现总结：
-
-> **复制聊天内容 → 解析消息（含图片/表情包）→ 存入数据库 ->前端选择群聊 -> 使用远程或本地LLM总结 **
-
-
-全程 **不调用 QQ 内部接口、不 Hook 进程、不注入 DLL**，极大降低账号封禁风险。
-
-还可以使用Ollama实现数据不出电脑。
-
-提示：由于使用了浏览器界面，可以尝试着在虚拟机中运行，并在实体机中查看聊天记录和总结。
 ---
 
-## 安装指南
+## ✨ 核心特性
 
-### 步骤 1：下载项目
-前往 [Releases 页面](https://github.com/Na2Cr2O7/QSummary/releases) 下载最新压缩包并解压。
+- 🛡️ **安全无痕**：纯视觉识别 + 模拟操作，不 Hook 进程、不注入 DLL，极大降低封号风险。
+- 🔒 **隐私至上**：支持完全本地运行（Ollama），聊天记录无需上传云端。
+- 🧠 **多模态解析**：支持提取文本、时间戳、用户昵称及本地图片/表情包路径。
+- 🔌 **灵活扩展**：兼容任意 OpenAI API 格式的本地或远程大模型。
+- 🖥️ **虚拟机友好**：基于浏览器 UI 设计，可在虚拟机运行，实体机查看结果。
 
-解压后大小<35M.
+---
 
-需要安装[umi-ocr](https://github.com/hiroi-sora/Umi-OCR/releases)作为OCR读取群名称
+## 🚀 快速开始
 
-可能需要安装[.NET10](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-10.0.203-windows-x64-installer)
+### 1. 环境准备
 
+| 依赖项 | 说明 | 备注 |
+| :--- | :--- | :--- |
+| **QSummary** | [下载最新 Release](https://github.com/Na2Cr2O7/QSummary/releases) | 解压后 < 35MB |
+| **Umi-OCR** | [下载地址](https://github.com/hiroi-sora/Umi-OCR/releases) | 用于 OCR 识别群名称，需开启 HTTP 服务 |
+| **.NET Runtime** | [.NET 10 SDK/Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-10.0.203-windows-x64-installer) | 程序运行基础环境 |
+| **Ollama** (推荐) | [官网下载](https://ollama.com/) | 本地大模型运行时 |
 
-### 步骤 2：配置大模型（推荐使用 Ollama）
+### 2. 模型配置
 
-安装 [Ollama](https://ollama.com/) 并拉取模型：
+安装 Ollama 后，根据设备性能拉取模型：
 
 ```bash
-# 推荐主力模型（20B，性能与效果平衡）
+# ☁️ 云端模型（无需拉取，直接在设置中填写 API Key）
 gpt-oss:20b-cloud
-#云端模型无需拉取，直接在设置中填上就可以了
 
+# 💻 本地推荐模型（20B，性能与效果平衡）
+ollama pull qwen2.5:20b
 
-# 低配设备可选（0.5B，轻量快速）
+# ⚡ 低配设备可选（0.5B，轻量快速）
 ollama pull qwen2.5:0.5b
 
-# 本地视觉多模态模型（实验性，效果一般，慎用）
+# 👁️ 视觉多模态模型（实验性，用于识别表情包/图片内容）
 ollama pull huihui_ai/qwen3-vl-abliterated:latest
 ```
 
+### 3. 初始化与运行
 
-
-### 步骤 3：初始化设置
-运行 `QsummaryUI.exe` 
-进入[localhost:8080](http://localhost:8080/)修改设置，如模型等
-使用Ollama时，服务器地址可以直接填写Ollama.
-umi-OCR中，打开允许HTTP服务.
+1.  启动 `QsummaryUI.exe`，访问 [http://localhost:8080](http://localhost:8080/) 进行设置。
+    -   **Ollama 用户**：服务器地址直接填写 `Ollama` (默认端口)。
+    -   **Umi-OCR**：确保在 Umi-OCR 设置中已勾选“允许 HTTP 服务”。
+2.  打开 QQ 并将其置于前台。
 ![alt text](image.png)
-
-## ▶️ 使用方法
-运行QsummaryCore.exe，确保QQ打开并置于前台
-
-> ******运行期间请勿更改 DPI/分辨率！******
-
-
+3.  运行 `QsummaryCore.exe` 开始自动监听与总结。
+> ⚠️ **重要警告**：运行期间 **严禁** 更改屏幕分辨率或 DPI 缩放比例！
 
 ---
 
-## ⚙️ QQ 推荐设置（提升识别准确率）
+## ⚙️ QQ 推荐设置
 
-| 设置项             | 推荐值                     |
-|--------------------|---------------------------|
-| **发送消息**          | **Ctrl+Enter**             |
-| 联系人面板宽度     | 拖动至**最窄**             |
-<!-- | 自动更新          | **关闭**             | -->
-<!-- | 字体大小           | 设为“**最小**”            | -->
-<!-- | 聊天背景           | 使用**默认白色背景**       | -->
-<!-- | 系统显示缩放       | **100% 或 125%**（避免 150%+）| -->
+为确保识别准确率，请将 QQ 调整为以下状态：
 
-<!-- > 📷 参考图示：
-![注意事项说明](./notice1.jpeg)
-![alt text](image.png) -->
-
----
-
-## 核心优势
-
-- **安全无痕**：纯视觉操作，零注入、零 Hook，几乎无封号风险  
-- **隐私可控**：支持完全本地运行，数据不出设备  
-- **灵活扩展**：可对接任意Open AI API本地大模型（如 Ollama）或远程 HTTP API  
-
-
-
----
-
-
-## 配置要求
-
->  ⚠️该程序不支持无头模式（至少外接一台显示器）
-
-### 最低要求
-
-### AMD64
-
-#### Windows
- - Windows 8.1 或更高版本 64位
-
- - 单核处理器，主频1GHz以上
-
- - 1GB RAM
-
- - 1GB 可用空间
-
- - 1920x1080 显示器
-
-> 对于windows7 可以尝试安装 [VkKex](https://github.com/YuZhouRen86/VxKex-NEXT)
-
-### 推荐配置
-
- - Windows 10 x64
-
- - 4核心，2GHz以上
-
- - 4GB RAM
-
- - 8GB 可用空间(用于Ollama)
-
- - 支持CUDA的GPU
-
-- 1920x1080 显示器
- 
-
----
-
-## ⚠️ 使用限制
-
-- 需图形界面，不支持服务器/远程桌面无头模式/窗口管理器  
-- 对 **屏幕分辨率** 和 **DPI 缩放比例** 敏感（推荐设置为 **100% 或 125%**）  
-- QQ 主窗口必须 **可见且未最小化**（不可被其他窗口遮挡）
+| 设置项 | 推荐值 | 原因 |
+| :--- | :--- | :--- |
+| **发送消息快捷键** | `Ctrl + Enter` | 避免回车键误触发送 |
+| **联系人面板宽度** | 拖至 **最窄** | 统一坐标定位基准 |
+| **系统显示缩放** | 100% 或 125% | 避免高 DPI 导致坐标偏移 |
+| **聊天背景** | 默认白色 | 提升 OCR 识别对比度 |
 
 ---
 
 ## 🔧 工作原理
 
-1. **窗口置顶**  
-   通过 `FocusqqWindow.dll`强制将 QQ 主窗口置顶，确保截图一致性。
+1.  **窗口置顶**：通过 `FocusqqWindow.dll` 强制 QQ 主窗口置顶，确保截图一致性。
+2.  **DPI 自适应**：`ScaleToINI.exe` 自动检测系统缩放并写入 `config.ini` 校准坐标。
+3.  **未读检测**：扫描联系人列表“小红点”，定位新消息会话。
+4.  **自动交互**：模拟点击红点位置，打开对应聊天窗口。
+5.  **内容提取**：框选识别聊天区域，解析为结构化 Markdown：
+    ```markdown
+    Username: 11-01 08:12:19
+    
+    这是一条包含图片的消息...
 
-2. **DPI 自适应**  
-   运行 `ScaleToINI.exe` 自动检测系统缩放比例，并写入 `config.ini` 用于坐标校准。
-
-3. **未读消息检测**  
-   在联系人列表区域扫描“小红点”，定位有新消息的会话。
-
-4. **自动交互**  
-   模拟鼠标点击红点位置，打开对应聊天窗口。
-
-5. **内容识别**  
-   - 使用框选功能提取聊天内容（含文本与图片）
-   - 示例格式：
-     ```markdown
-     Username: 11-01 08:12:19
-     <img src="file://C:/Image.png" />
-     内容内容内容...
-
-     aaaaaaaaaaa: 11-25 08:10:36
-     普通文字，没有图片
-
-     bbbbbbbbbbb: 11-25 08:11:00
-     <img src="file:///C:/Users/Admin/Pictures/test%20image.png" />
-     还有这张图！
-     ```
-   - 支持提取普通文本、时间戳、用户昵称及本地图片路径
-   - 可识别并提取表情包（需启用视觉模型）
-
-8. **会话清理**  
-   完成后自动关闭当前聊天窗口，返回主界面继续监听。
-
+    UserB: 11-25 08:10:36
+    这是一条纯文本消息
+    ```
+6.  **循环监听**：处理完成后自动关闭窗口，返回主界面继续下一轮检测。
 
 ---
 
-## 🛠️ 编译说明（开发者）
+## 💻 系统要求
 
-使用 **Visual Studio 2026** 打开并编译以下解决方案：
-- `VisionQQ_C.slnx`
-- `QQPilot4\QQPilot4.slnx`
+> ⚠️ **注意**：本程序依赖图形界面，**不支持**无头模式（Headless）、远程桌面或纯命令行服务器。
+
+| 配置等级 | CPU | 内存 | 存储 | 显示器 | 系统版本 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **最低配置** | 单核 1GHz+ | 1 GB | 1 GB | 1920×1080 | Win8.1 x64+ |
+| **推荐配置** | 4核 2GHz+ | 4 GB | 8 GB (含模型) | 1920×1080 | Win10/11 x64 |
+
+-   **GPU 加速**：推荐使用 NVIDIA CUDA 显卡以加速本地模型推理。
+-   **Windows 7 用户**：请尝试安装 [VkKex](https://github.com/YuZhouRen86/VxKex-NEXT) 兼容层。
+
+---
+
+## 🛠️ 开发者指南
+
+使用 **Visual Studio 2026** 打开解决方案进行编译：
+-   `QQPilot4\QQPilot4.slnx`
 
 ---
 
 ## 🛡️ 免责声明
 
-本软件 **仅限技术学习与研究用途**，严禁用于：
-- 自动骚扰、刷屏、诈骗等恶意行为  
-- 违反《QQ 软件许可协议》的操作  
-- 任何违法违规场景
+本项目 **仅限技术学习与研究用途**。严禁用于自动骚扰、刷屏、诈骗等恶意行为或任何违反《QQ 软件许可协议》的场景。
 
 使用者须自行承担因使用本软件引发的一切法律责任，作者概不负责。
 
-本项目采用 [MIT License](LICENSE)
+---
 
+<div align="center">
 
-
-
-
-
-
-
-
-
+**如果这个项目对你有帮助，请点亮 ⭐ Star 支持一下！**
