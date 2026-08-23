@@ -74,6 +74,7 @@ ollama pull qwen3-embedding:0.6b
 1.  启动 `QsummaryUI.exe`，访问 [http://localhost:8080](http://localhost:8080/) 进行设置。
     -   **Ollama 用户**：服务器地址直接填写 `Ollama` (默认端口)。
     -   **Umi-OCR**：确保在 Umi-OCR 设置中已勾选“允许 HTTP 服务”。
+    -   **需要词嵌入模型才能使用RAG哦**
 2.  打开 QQ 并将其置于前台。
 ![alt text](image.png)
 3.  运行 `QsummaryCore.exe` 开始自动监听与总结。
