@@ -605,3 +605,5 @@ Na₂IrCl₆•6H₂O:【空】
 [10:25 AM]数据库已清空
 [10:34 AM]File=C:\Users\Develop\QSummary\QsummaryUI\groups.sqlite3
 [10:51 AM]File=C:\Users\Develop\QSummary\qsummaryui\groups.sqlite3
+[4:51 PM]File=c:\Users\Develop\QSummary\QsummaryUI\groups.sqlite3
+[5:36 PM]File=C:\Users\Develop\QSummary\QsummaryUI\groups.sqlite3

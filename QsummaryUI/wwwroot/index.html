@@ -11,10 +11,10 @@
 <body>
     <div class="container" id="app">
         <header>
-            <h1>QSummary - 聊天记录总结</h1>
+            <h1>QSummary - 聊天记录总结 <small style="font-size:14px;color:#888;">Map-Reduce + RAG 版</small></h1>
             <div class="top-bar">
-                <button class="btn-secondary" onclick="showHome()">主页</button>
-                <button class="btn-secondary" onclick="showSettings()">设置</button>
+                <button class="btn-secondary" onclick="showHome()">🏠 主页</button>
+                <button class="btn-secondary" onclick="showSettings()">⚙️ 设置</button>
             </div>
         </header>
         <div id="content">
@@ -22,11 +22,11 @@
         </div>
     </div>
 
-    <!-- 模态框模板 -->
+    <!-- 1. 原有：全量总结确认模态框 -->
     <div class="modal-overlay" id="confirmModal" style="display: none;">
         <div class="modal">
             <h2>确认总结</h2>
-            <p id="confirmMessage">确定要进行总结吗？</p>
+            <p id="confirmMessage" style="white-space:pre-line;">确定要进行总结吗？</p>
             <div class="modal-actions">
                 <button class="btn-secondary" onclick="closeModal()">取消</button>
                 <button class="btn-primary" onclick="confirmSummary()">开始总结</button>
@@ -34,7 +34,30 @@
         </div>
     </div>
 
-    <!-- 删除确认模态框 -->
+    <!-- 2. 新增：Map-Reduce 参数确认模态框 -->
+    <div class="modal-overlay" id="mapReduceModal" style="display: none;">
+        <div class="modal" style="width: 480px;">
+            <h2>🧩 Map-Reduce 总结参数</h2>
+            <p>群组：<b id="mrGroupName" style="word-break:break-all;"></b></p>
+            <div style="margin:15px 0;">
+                <label style="display:block;font-weight:bold;margin-bottom:5px;">
+                    每个小块的消息数量（权重）：
+                </label>
+                <input type="number" id="mrChunkSize" min="5" max="500" value="60" style="width:100%;padding:8px;">
+                <small style="color:#888;display:block;margin-top:5px;">
+                    • 数值大 = 块少、每块信息多，适合较短记录<br>
+                    • 数值小 = 块多、切分细，适合超长记录<br>
+                    • 推荐 40~100 之间；聊天记录超过 500 条建议降到 20~40
+                </small>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn-primary" onclick="confirmMapReduce()">🧩 开始 Map-Reduce 总结</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 删除确认模态框 -->
     <div class="modal-overlay" id="deleteConfirmModal" style="display: none;">
         <div class="modal">
             <h2 style="color: var(--danger-color);">确认删除</h2>

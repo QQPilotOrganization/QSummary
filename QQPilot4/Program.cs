@@ -18,7 +18,10 @@ namespace QSummaryCore
         static async Task Main(string[] args)
         {
 
- 
+            if (Environment.OSVersion.Version.Major >= 10)
+            {
+                Console.OutputEncoding = Encoding.UTF8;
+            }
 
             DB db = new();
             Process? p=null;
@@ -118,9 +121,13 @@ namespace QSummaryCore
             //Image.CropImage("screenshot.png", "dst.png", NameActualSize.Item1, NameActualSize.Item2, NameActualSize.Item3, NameActualSize.Item4);
             OcrClient ocr = new();
 
+            Log.Print("======================================================");
+            Log.Print("");
+            Log.Print("\t使用时请勿移动鼠标！");
+            Log.Print("");
+            Log.Print("======================================================");
 
 
- 
             bool cancelled=false;
             Console.CancelKeyPress += (sender, e) =>
             {
@@ -182,12 +189,7 @@ namespace QSummaryCore
                     Thread.Sleep(500);
                     GUIOperation.GotoCenter(conversationActualSize);
                     Thread.Sleep(500);
-                    for (int i = 0; i < scrollTries*2; i++)
-                    {
-                        Thread.Sleep(400);
-                        GUIOperation.ScrollDown(480);
 
-                    }
                     Image.Screenshot(copyButtonPossibleActualSize);
                     Thread.Sleep(1000);
                     List<(uint x, uint y)> points = Image.FindTemplates("screenshot.png", "./copy.png",30,1);
@@ -195,7 +197,12 @@ namespace QSummaryCore
                     {
                         Log.Print("使用模板匹配查找复制按钮失败");
                         //DockLog.Log2("使用模板匹配查找复制按钮失败");
+                        for (int i = 0; i < scrollTries * 2; i++)
+                        {
+                            Thread.Sleep(400);
+                            GUIOperation.ScrollDown(480);
 
+                        }
                         GUIOperation.ClickCenter(commentSectionActualSize);
 
                         for (int i = 0; i <tapTimes; i++)
@@ -225,16 +232,21 @@ namespace QSummaryCore
                     db.Insert(groupName, ChatContents);
                     Log.Print(groupName);
                     GUIOperation.ClickCenter(commentSectionActualSize);
-
+                    SpinnerLoad.Stop();
                     Thread.Sleep(100);
                     Log.Print("退出会话");
 
-                    GUIOperation.Click(chatButtonActualPosition.Item1 + (int)(100 * scale), chatButtonActualPosition.Item2 + (int)(80 * scale));
-                    Thread.Sleep(3000);
-                    GUIOperation.Click(contactButtonActualPosition.Item1, contactButtonActualPosition.Item2);
-                    Thread.Sleep(100);
-                    GUIOperation.Click(chatButtonActualPosition.Item1, chatButtonActualPosition.Item2);
-                    Thread.Sleep(1000);
+
+                    List<(uint x, uint y)> points2 =[];
+                    do
+                    {
+                        GUIOperation.Click(chatButtonActualPosition.Item1 + (int)(100 * scale), chatButtonActualPosition.Item2 + (int)(80 * scale));
+                        Thread.Sleep(800);
+                        Image.Screenshot(copyButtonPossibleActualSize);
+                        Thread.Sleep(1000);
+                        points2 = Image.FindTemplates("screenshot.png", "./copy.png", 30, 1);
+                    } while (points2.Count!=0);
+
                 }
                 else
                 {

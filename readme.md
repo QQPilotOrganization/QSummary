@@ -49,6 +49,7 @@
 
 ### 2. 模型配置
 
+推荐使用Ollama ，但是所有OpenAI Chat Completion API 的都支持。
 安装 Ollama 后，根据设备性能拉取模型：
 
 ```bash
@@ -61,8 +62,11 @@ ollama pull qwen2.5:20b
 # ⚡ 低配设备可选（0.5B，轻量快速）
 ollama pull qwen2.5:0.5b
 
-# 👁️ 视觉多模态模型（实验性，用于识别表情包/图片内容）
-ollama pull huihui_ai/qwen3-vl-abliterated:latest
+# 👁️ 视觉多模态模型
+ollama pull minicpm-v4.6:1b
+
+#词嵌入模型
+ollama pull qwen3-embedding:0.6b
 ```
 
 ### 3. 初始化与运行
@@ -73,7 +77,7 @@ ollama pull huihui_ai/qwen3-vl-abliterated:latest
 2.  打开 QQ 并将其置于前台。
 ![alt text](image.png)
 3.  运行 `QsummaryCore.exe` 开始自动监听与总结。
-> ⚠️ **重要警告**：运行期间 **严禁** 更改屏幕分辨率或 DPI 缩放比例！
+> ⚠️ **重要警告**：运行期间 **严禁** 更改屏幕分辨率，鼠标位置和 DPI 缩放比例！
 
 ---
 
